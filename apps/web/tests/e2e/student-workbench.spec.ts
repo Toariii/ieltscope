@@ -106,6 +106,12 @@ test("renders a completed diagnostic report from stored skill estimates", async 
     await sql`insert into student_profiles (user_id, onboarding_step, onboarding_completed_at)
       values (${createdUser.id}, 'complete', now())
       on conflict (user_id) do update set onboarding_step = 'complete', onboarding_completed_at = now()`;
+    await sql`
+      insert into goals (user_id, target_exam_date, target_overall, minimum_skills, weekly_minutes, active)
+      values (${createdUser.id}, now() + interval '90 days', 14, ${sql.json({
+        writing: 13,
+        speaking: 13,
+      })}, 600, true)`;
     const [assessment] = await sql<{ id: string }[]>`
       insert into assessments (user_id, status, submitted_at, completed_at)
       values (${createdUser.id}, 'completed', now(), now())
@@ -137,6 +143,12 @@ test("renders a completed diagnostic report from stored skill estimates", async 
     await expect(page.getByText("区间 5.0–6.0")).toBeVisible();
     await expect(page.getByText("补因果链展开")).toBeVisible();
     await expect(page.getByText("当前阶段：报告生成 · 已完成 · diagnostic-alpha-v1")).toBeVisible();
+    await page.getByRole("link", { name: "进入学习计划" }).click();
+    await expect(page).toHaveURL("/plan");
+    await expect(page.getByRole("heading", { name: "报告测试学生的第一阶段备考路径" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "每科目标与本周投入" })).toBeVisible();
+    await expect(page.getByText("写作 · Task 2 因果链")).toBeVisible();
+    await expect(page.getByText("基于诊断估分与目标档案生成")).toBeVisible();
   } finally {
     await sql`delete from "user" where email = ${email}`;
     await sql.end();

@@ -14,6 +14,7 @@ describe("AppShell", () => {
     const navigation = screen.getByRole("navigation", { name: "学习导航" });
     expect(navigation).toHaveTextContent("首页");
     expect(navigation).toHaveTextContent("今日计划");
+    expect(navigation).toHaveTextContent("学习计划");
     expect(navigation).toHaveTextContent("练习题库");
     expect(navigation).toHaveTextContent("词汇");
     expect(navigation).toHaveTextContent("听力");

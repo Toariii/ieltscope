@@ -55,7 +55,9 @@ test("answers and submits the free diagnostic after onboarding", async ({ page }
     await register(page, email);
     await page.getByLabel("首次备考或暂无可参考成绩").check();
     await page.getByRole("button", { name: "保存并继续" }).click();
+    await expect(page).toHaveURL("/onboarding/records");
     await page.getByRole("button", { name: "保存并继续" }).click();
+    await expect(page).toHaveURL("/onboarding/goal");
     await page.getByLabel("目标总分").selectOption("7");
     await page.getByLabel("预计考试日期").fill(futureDate());
     await page.getByLabel("每周学习小时").fill("10");

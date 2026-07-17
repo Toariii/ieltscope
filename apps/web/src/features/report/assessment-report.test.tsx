@@ -90,5 +90,6 @@ describe("AssessmentReport", () => {
     expect(screen.getByText("区间 5.0–6.0")).toBeVisible();
     expect(screen.getByText("补因果链展开")).toBeVisible();
     expect(screen.getByText("当前阶段：报告生成 · 已完成 · diagnostic-alpha-v1")).toBeVisible();
+    expect(screen.getByRole("link", { name: "进入学习计划" })).toHaveAttribute("href", "/plan");
   });
 });

@@ -70,7 +70,7 @@ const stateCopy = {
     title: "四科诊断报告",
     description: "以下结果来自诊断评分结果，用于生成后续目标拆解和学习计划。",
     actionLabel: "进入学习计划",
-    actionHref: "/dashboard",
+    actionHref: "/plan",
   },
 } as const;
 
@@ -169,9 +169,9 @@ export function AssessmentReport({ view }: { view: AssessmentReportView }) {
           <section className={styles.nextStep} aria-labelledby="report-next-title">
             <AlertCircle aria-hidden="true" />
             <div>
-              <h2 id="report-next-title">下一步会接学习计划生成</h2>
+              <h2 id="report-next-title">下一步进入学习计划</h2>
               <p>
-                后续会根据目标分数、考试时间和四科估分生成任务优先级。当前页面已经预留真实评分结果入口。
+                计划页会根据目标分数、考试时间和四科估分生成任务优先级。当前版本先提供规则版计划壳，后续接入 AI 和教师校准。
               </p>
             </div>
           </section>

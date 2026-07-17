@@ -17,6 +17,7 @@ import {
   Mic2,
   NotebookTabs,
   Search,
+  Target,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -29,6 +30,7 @@ import styles from "./app-shell.module.css";
 const navigation = [
   { label: "首页", href: "/dashboard#dashboard-top", icon: House },
   { label: "今日计划", href: "/dashboard#today-plan", icon: CalendarDays },
+  { label: "学习计划", href: "/plan", icon: Target },
   { label: "练习题库", href: "/dashboard#practice", icon: Compass },
   { label: "词汇", href: "/dashboard#skill-goals", icon: BookOpenText },
   { label: "听力", href: "/dashboard#skill-goals", icon: Headphones },

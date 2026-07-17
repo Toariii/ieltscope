@@ -23,6 +23,8 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
   - completed diagnostic: unlock the full workbench.
 - The full dashboard remains locked until a future completed assessment exists.
 - `/report` is now the diagnostic report shell. It shows pending states without fake scores, an empty completed-report shell when four skill estimates are missing, and the full four-skill report when `skill_estimates` are present.
+- `/plan` is now the first study-plan shell. It reads the active goal plus completed diagnostic `skill_estimates`, then generates a rule-based target breakdown, priority order and first-week task outline.
+- The study-plan shell is explicitly an alpha rule generator. It does not claim AI personalization yet and can be replaced by the later provider/teacher-calibrated plan worker.
 
 ## Data Flow
 
@@ -35,6 +37,7 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
 - `/api/internal/assessment-evaluations/run-dev` is an internal development trigger. It is authenticated, works only on the current student, and stays closed unless `ENABLE_DEV_EVALUATION_SIMULATOR=true`.
 - `/dashboard` reads the latest active assessment and its evaluation status. It never treats `submitted` as a scored result, so simulated plans stay hidden while scoring is pending.
 - `/report` reads the latest assessment, `assessment_evaluations` and `skill_estimates`; `rationale.summary` and `rationale.priorities` provide the first stable slots for AI/teacher-produced feedback.
+- `/plan` reads `goals`, the latest completed `assessments`, and `skill_estimates`. It uses target overall, optional single-skill minimums and weekly minutes to allocate a first-week training ratio.
 
 ## Deferred
 
@@ -43,7 +46,7 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
 - Timers, pause/resume rules and anti-refresh edge cases.
 - AI scoring, independent scoring engine, teacher anchors and provider routing.
 - Production worker conversion from submitted diagnostic to completed diagnostic and skill estimates.
-- Actual scoring worker/provider calls, teacher adjudication UI and study plan generation.
+- Actual scoring worker/provider calls, teacher adjudication UI and AI/teacher-calibrated persistent study plan generation.
 
 ## Verification
 
