@@ -38,7 +38,7 @@ const navigation = [
   { label: "写作精批", href: "/writing", icon: FilePenLine },
   { label: "口语精批", href: "/speaking", icon: Mic2 },
   { label: "学习报告", href: "/report", icon: BarChart3 },
-  { label: "会员中心", href: "/dashboard#membership", icon: CreditCard },
+  { label: "会员中心", href: "/membership", icon: CreditCard },
 ];
 
 export function AppShell({
@@ -167,7 +167,7 @@ export function AppShell({
             {profileOpen ? (
               <div className={`${styles.popover} ${styles.profileMenu}`}>
                 <strong>{studentName}</strong>
-                <a href="#membership">会员与精批额度</a>
+                <a href="/membership">会员与精批额度</a>
                 <SignOutButton />
               </div>
             ) : null}

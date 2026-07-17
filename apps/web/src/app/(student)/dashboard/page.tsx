@@ -6,6 +6,7 @@ import { AppShell } from "@/components/app-shell";
 import { StudentDashboard } from "@/features/dashboard/student-dashboard";
 import { demoStudentWorkbench } from "@/features/dashboard/student-workbench-data";
 import { studyPlanToWorkbenchView } from "@/features/dashboard/student-workbench-real-data";
+import { membershipRepository } from "@/features/membership/membership-server";
 import { onboardingDb, onboardingService } from "@/features/onboarding/onboarding-server";
 import { getStudyPlanView } from "@/features/study-plan/study-plan-data";
 import { auth } from "@/lib/auth/server";
@@ -49,8 +50,9 @@ export default async function DashboardPage() {
           studentName,
         });
         if (planView.state === "ready") {
+          const credits = await membershipRepository.getCreditBalance(userId);
           stage = "ready";
-          data = studyPlanToWorkbenchView(planView);
+          data = studyPlanToWorkbenchView(planView, { credits });
         } else {
           stage = "assessment";
         }

@@ -376,7 +376,7 @@ export function StudentDashboard({
                 <span className={styles.progressTrack}><span style={{ width: `${weeklyPercent}%` }} /></span>
               </div>
             </dl>
-            <a className={styles.membershipLink} href="#membership">管理会员与兑换码 <ArrowRight aria-hidden="true" /></a>
+            <Link className={styles.membershipLink} href="/membership">管理会员与兑换码 <ArrowRight aria-hidden="true" /></Link>
           </section>
         </aside>
       </div>
