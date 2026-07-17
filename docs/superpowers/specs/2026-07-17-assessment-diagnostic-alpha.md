@@ -20,8 +20,8 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
 - The dashboard now distinguishes three post-onboarding states:
   - no diagnostic or draft/in-progress diagnostic: continue ability diagnostic;
   - submitted diagnostic: show a waiting-for-scoring handoff with the current evaluation status, AI initial scoring and teacher-calibration steps;
-  - completed diagnostic: unlock the full workbench.
-- The full dashboard remains locked until a future completed assessment exists.
+  - completed diagnostic with four skill estimates and an active goal: unlock the full workbench from the same real plan view used by `/plan`.
+- The full dashboard remains locked until a completed assessment, four `skill_estimates` and an active goal exist.
 - `/report` is now the diagnostic report shell. It shows pending states without fake scores, an empty completed-report shell when four skill estimates are missing, and the full four-skill report when `skill_estimates` are present.
 - `/plan` is now the first study-plan shell. It reads the active goal plus completed diagnostic `skill_estimates`, then generates a rule-based target breakdown, priority order and first-week task outline.
 - The study-plan shell is explicitly an alpha rule generator. It does not claim AI personalization yet and can be replaced by the later provider/teacher-calibrated plan worker.
@@ -36,6 +36,7 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
 - `/api/assessment/submit` submits after all required alpha questions are answered and ensures an evaluation task exists.
 - `/api/internal/assessment-evaluations/run-dev` is an internal development trigger. It is authenticated, works only on the current student, and stays closed unless `ENABLE_DEV_EVALUATION_SIMULATOR=true`.
 - `/dashboard` reads the latest active assessment and its evaluation status. It never treats `submitted` as a scored result, so simulated plans stay hidden while scoring is pending.
+- When ready, `/dashboard` adapts the real `/plan` view into the existing workbench layout instead of showing demo skill scores.
 - `/report` reads the latest assessment, `assessment_evaluations` and `skill_estimates`; `rationale.summary` and `rationale.priorities` provide the first stable slots for AI/teacher-produced feedback.
 - `/plan` reads `goals`, the latest completed `assessments`, and `skill_estimates`. It uses target overall, optional single-skill minimums and weekly minutes to allocate a first-week training ratio.
 

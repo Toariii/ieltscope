@@ -5,7 +5,9 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import { AppShell } from "@/components/app-shell";
 import { StudentDashboard } from "@/features/dashboard/student-dashboard";
 import { demoStudentWorkbench } from "@/features/dashboard/student-workbench-data";
+import { studyPlanToWorkbenchView } from "@/features/dashboard/student-workbench-real-data";
 import { onboardingDb, onboardingService } from "@/features/onboarding/onboarding-server";
+import { getStudyPlanView } from "@/features/study-plan/study-plan-data";
 import { auth } from "@/lib/auth/server";
 import { assessmentEvaluations, assessments } from "@/lib/db/schema";
 
@@ -17,7 +19,7 @@ export default async function DashboardPage() {
   const session = await auth.api.getSession({ headers: await headers() });
   const studentName = session?.user.name?.trim() || "同学";
   const userId = session?.user.id;
-  const data = { ...demoStudentWorkbench, studentName };
+  let data = { ...demoStudentWorkbench, studentName };
   let stage: "onboarding" | "assessment" | "assessmentSubmitted" | "ready" = "onboarding";
   let assessmentEvaluation: {
     status: "queued" | "processing" | "completed" | "failed";
@@ -41,7 +43,17 @@ export default async function DashboardPage() {
         .orderBy(desc(assessments.updatedAt), desc(assessments.createdAt))
         .limit(1);
       if (latestAssessment?.status === "completed") {
-        stage = "ready";
+        const planView = await getStudyPlanView({
+          db: onboardingDb,
+          userId,
+          studentName,
+        });
+        if (planView.state === "ready") {
+          stage = "ready";
+          data = studyPlanToWorkbenchView(planView);
+        } else {
+          stage = "assessment";
+        }
       } else if (latestAssessment?.status === "submitted") {
         stage = "assessmentSubmitted";
         const [evaluation] = await onboardingDb
