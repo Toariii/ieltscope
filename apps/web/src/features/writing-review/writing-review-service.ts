@@ -100,6 +100,28 @@ function countWords(text: string) {
     .filter(Boolean).length;
 }
 
+export function validateWritingDraftInput(input: WritingDraftSubmitInput) {
+  const text = input.text.trim();
+  const wordCount = countWords(text);
+  if (wordCount < 20) {
+    return {
+      ok: false as const,
+      errors: { text: "请至少输入 20 个英文词，系统才能生成有参考价值的批改。" },
+    };
+  }
+
+  return {
+    ok: true as const,
+    data: {
+      taskType: input.taskType,
+      promptTitle: input.promptTitle.trim(),
+      promptText: input.promptText.trim(),
+      text,
+      wordCount,
+    },
+  };
+}
+
 function toView({
   submission,
   evaluation,
@@ -136,25 +158,20 @@ function toView({
 export function createWritingReviewService(repository: WritingReviewRepository) {
   return {
     async submitDraft(userId: string, input: WritingDraftSubmitInput) {
-      const text = input.text.trim();
-      const wordCount = countWords(text);
-      if (wordCount < 20) {
-        return {
-          ok: false as const,
-          errors: { text: "请至少输入 20 个英文词，系统才能生成有参考价值的批改。" },
-        };
-      }
+      const validation = validateWritingDraftInput(input);
+      if (!validation.ok) return validation;
+      const { text, wordCount, promptTitle, promptText, taskType } = validation.data;
 
       const alphaEvaluation = evaluateWritingDraft({
-        taskType: input.taskType,
-        prompt: input.promptText,
+        taskType,
+        prompt: promptText,
         text,
       });
       const submission = await repository.createSubmission({
         userId,
-        promptTitle: input.promptTitle.trim(),
-        promptText: input.promptText.trim(),
-        taskType: input.taskType,
+        promptTitle,
+        promptText,
+        taskType,
         text,
         wordCount,
       });

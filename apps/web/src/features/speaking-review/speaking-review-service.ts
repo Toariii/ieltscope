@@ -104,6 +104,29 @@ function countWords(text: string) {
   return text.trim().split(/\s+/u).filter(Boolean).length;
 }
 
+export function validateSpeakingTranscriptInput(input: SpeakingTranscriptSubmitInput) {
+  const transcript = input.transcript.trim();
+  const wordCount = countWords(transcript);
+  if (wordCount < 20) {
+    return {
+      ok: false as const,
+      errors: { transcript: "请至少输入 20 个英文词，系统才能生成有参考价值的口语反馈。" },
+    };
+  }
+
+  return {
+    ok: true as const,
+    data: {
+      part: input.part,
+      promptTitle: input.promptTitle.trim(),
+      promptText: input.promptText.trim(),
+      transcript,
+      wordCount,
+      durationSeconds: Math.max(0, Math.round(input.durationSeconds)),
+    },
+  };
+}
+
 function toView({
   submission,
   evaluation,
@@ -142,28 +165,23 @@ function toView({
 export function createSpeakingReviewService(repository: SpeakingReviewRepository) {
   return {
     async submitTranscript(userId: string, input: SpeakingTranscriptSubmitInput) {
-      const transcript = input.transcript.trim();
-      const wordCount = countWords(transcript);
-      if (wordCount < 20) {
-        return {
-          ok: false as const,
-          errors: { transcript: "请至少输入 20 个英文词，系统才能生成有参考价值的口语反馈。" },
-        };
-      }
+      const validation = validateSpeakingTranscriptInput(input);
+      if (!validation.ok) return validation;
+      const { part, promptTitle, promptText, transcript, wordCount, durationSeconds } = validation.data;
 
       const alphaEvaluation = evaluateSpeakingResponse({
-        part: input.part,
-        prompt: input.promptText,
+        part,
+        prompt: promptText,
         transcript,
       });
       const submission = await repository.createSubmission({
         userId,
-        promptTitle: input.promptTitle.trim(),
-        promptText: input.promptText.trim(),
-        part: input.part,
+        promptTitle,
+        promptText,
+        part,
         transcript,
         wordCount,
-        durationSeconds: Math.max(0, Math.round(input.durationSeconds)),
+        durationSeconds,
       });
       const evaluation = await repository.createEvaluation({
         submissionId: submission.id,

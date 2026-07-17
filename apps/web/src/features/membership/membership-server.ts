@@ -27,3 +27,10 @@ export async function redeemMembershipCode(userId: string, code: string) {
   await ensureAlphaRedemptionCode(database.db);
   return membershipService.redeem(userId, code);
 }
+
+export async function consumeMembershipReviewCredit(
+  userId: string,
+  input: { kind: "writing" | "speaking"; referenceId: string },
+) {
+  return membershipService.consumeReviewCredit(userId, input);
+}

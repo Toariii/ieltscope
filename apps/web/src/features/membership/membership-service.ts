@@ -28,6 +28,14 @@ export type MembershipRepository = {
     expiresAt: Date;
     idempotencyKey: string;
   }): Promise<boolean>;
+  consumeCredit(input: {
+    userId: string;
+    credits: number;
+    reason: string;
+    referenceType: string;
+    referenceId: string;
+    idempotencyKey: string;
+  }): Promise<boolean>;
   getCreditBalance(userId: string): Promise<number>;
   listActiveMemberships(userId: string): Promise<MembershipView[]>;
 };
@@ -121,6 +129,42 @@ export function createMembershipService(
       });
       if (!redeemed) {
         return { ok: false as const, error: "兑换码不可用或已被使用。" };
+      }
+
+      return {
+        ok: true as const,
+        data: await this.getCenter(userId),
+      };
+    },
+
+    async consumeReviewCredit(
+      userId: string,
+      input: {
+        kind: "writing" | "speaking";
+        referenceId: string;
+      },
+    ) {
+      const balance = await repository.getCreditBalance(userId);
+      if (balance < 1) {
+        return {
+          ok: false as const,
+          error: "VIP 精批余额不足，请先到会员中心兑换后再提交。",
+        };
+      }
+
+      const consumed = await repository.consumeCredit({
+        userId,
+        credits: 1,
+        reason: `${input.kind}_review`,
+        referenceType: "evaluation",
+        referenceId: input.referenceId,
+        idempotencyKey: `review:${input.kind}:${input.referenceId}:${userId}`,
+      });
+      if (!consumed) {
+        return {
+          ok: false as const,
+          error: "VIP 精批余额不足，请先到会员中心兑换后再提交。",
+        };
       }
 
       return {

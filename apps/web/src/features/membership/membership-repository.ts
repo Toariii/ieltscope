@@ -113,6 +113,29 @@ export function createMembershipRepository(db: Database): MembershipRepository {
       return Number(row?.total ?? 0);
     },
 
+    async consumeCredit(input) {
+      const [balanceRow] = await db
+        .select({ total: sum(creditLedger.delta) })
+        .from(creditLedger)
+        .where(eq(creditLedger.userId, input.userId));
+      if (Number(balanceRow?.total ?? 0) < input.credits) return false;
+
+      const [entry] = await db
+        .insert(creditLedger)
+        .values({
+          userId: input.userId,
+          delta: -input.credits,
+          reason: input.reason,
+          referenceType: input.referenceType,
+          referenceId: input.referenceId,
+          idempotencyKey: input.idempotencyKey,
+        })
+        .onConflictDoNothing()
+        .returning({ id: creditLedger.id });
+
+      return Boolean(entry);
+    },
+
     async listActiveMemberships(userId) {
       const rows = await db
         .select()

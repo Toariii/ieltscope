@@ -52,6 +52,22 @@ function createMemoryRepository(seed: {
       });
       return true;
     },
+    async consumeCredit(input) {
+      const balance =
+        (seed.credits ?? 0) +
+        ledger
+          .filter((entry) => entry.userId === input.userId)
+          .reduce((total, entry) => total + entry.delta, 0);
+      if (balance < input.credits) return false;
+      if (ledger.some((entry) => entry.idempotencyKey === input.idempotencyKey)) return false;
+      ledger.push({
+        userId: input.userId,
+        delta: -input.credits,
+        reason: input.reason,
+        idempotencyKey: input.idempotencyKey,
+      });
+      return true;
+    },
     async getCreditBalance(userId) {
       return (seed.credits ?? 0) + ledger.filter((entry) => entry.userId === userId).reduce((total, entry) => total + entry.delta, 0);
     },
@@ -116,6 +132,33 @@ describe("createMembershipService", () => {
     await expect(service.redeem("student-1", "IELTSCOPE-0000")).resolves.toEqual({
       ok: false,
       error: "兑换码已过激活期限。",
+    });
+  });
+
+  it("consumes one review credit for a completed writing or speaking evaluation", async () => {
+    const service = createMembershipService(createMemoryRepository({ codes: [], credits: 2 }));
+
+    const result = await service.consumeReviewCredit("student-1", {
+      kind: "writing",
+      referenceId: "evaluation-1",
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.credits).toBe(1);
+  });
+
+  it("rejects review credit consumption when the balance is empty", async () => {
+    const service = createMembershipService(createMemoryRepository({ codes: [], credits: 0 }));
+
+    await expect(
+      service.consumeReviewCredit("student-1", {
+        kind: "speaking",
+        referenceId: "evaluation-1",
+      }),
+    ).resolves.toEqual({
+      ok: false,
+      error: "VIP 精批余额不足，请先到会员中心兑换后再提交。",
     });
   });
 });
