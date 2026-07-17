@@ -243,6 +243,16 @@
   background: #fbfcfb;
 }
 
+.masteredCard {
+  border-color: #b7d7cf;
+  background: #f4fbf8;
+}
+
+.reviewCard {
+  border-color: #e3c8bd;
+  background: #fff9f6;
+}
+
 .cardHeader {
   display: grid;
   gap: 6px;
@@ -304,6 +314,96 @@
   color: #7a8983;
   font-size: 11px;
   line-height: 1.5;
+}
+
+.vocabularySummary {
+  display: grid;
+  margin-bottom: 18px;
+  overflow: hidden;
+  border: 1px solid #d7dfdc;
+  border-radius: 15px;
+  background: #f8faf9;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.vocabularySummary div {
+  display: grid;
+  min-height: 74px;
+  align-content: center;
+  gap: 4px;
+  padding: 0 16px;
+}
+
+.vocabularySummary div + div {
+  border-left: 1px solid #dfe7e4;
+}
+
+.vocabularySummary span {
+  color: #71817a;
+  font-size: 12px;
+}
+
+.vocabularySummary strong {
+  color: #14211e;
+  font-size: 22px;
+}
+
+.progressMessage {
+  margin: -4px 0 16px;
+  color: #0f6b62;
+  font-size: 13px;
+}
+
+.vocabActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 4px;
+  border-top: 1px solid #dfe7e4;
+}
+
+.vocabActions > span {
+  color: #60706a;
+  font-size: 12px;
+  font-weight: 740;
+}
+
+.vocabActions > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.vocabActions button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #cbd7d3;
+  border-radius: 999px;
+  background: #fff;
+  color: #3d4d47;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.vocabActions button:disabled {
+  cursor: wait;
+  opacity: 0.66;
+}
+
+.vocabActions .activeReviewAction {
+  border-color: #c96658;
+  background: #c96658;
+  color: #fff;
+}
+
+.vocabActions .activeMasteredAction {
+  border-color: #0f6b62;
+  background: #0f6b62;
+  color: #fff;
 }
 
 .metaLine {
@@ -417,8 +517,14 @@
 
   .hero,
   .toolbar,
+  .vocabularySummary,
   .cardGrid {
     grid-template-columns: 1fr;
+  }
+
+  .vocabularySummary div + div {
+    border-top: 1px solid #dfe7e4;
+    border-left: 0;
   }
 
   .hero h1 {
@@ -432,6 +538,15 @@
   }
 
   .filters {
+    justify-content: flex-start;
+  }
+
+  .vocabActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .vocabActions > div {
     justify-content: flex-start;
   }
 }

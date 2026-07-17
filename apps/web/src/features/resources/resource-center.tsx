@@ -24,6 +24,17 @@ import {
 } from "./resource-catalog";
 import styles from "./resource-center.module.css";
 
+type VocabularyProgressView = {
+  masteredIds: string[];
+  reviewIds: string[];
+  streakDays: number;
+  weeklyMinutes: number;
+};
+
+type ProgressApiResponse =
+  | { ok: true; data: VocabularyProgressView }
+  | { ok: false; error: { message: string } };
+
 const tabIcons = {
   vocabulary: BookOpenText,
   practice: Headphones,
@@ -57,9 +68,19 @@ function FilterButton({
   );
 }
 
-function VocabularyCard({ item }: { item: VocabularyEntry }) {
+function VocabularyCard({
+  item,
+  status,
+  pending,
+  onStatusChange,
+}: {
+  item: VocabularyEntry;
+  status: "mastered" | "review" | null;
+  pending: boolean;
+  onStatusChange: (resourceId: string, status: "mastered" | "review") => void;
+}) {
   return (
-    <article className={styles.card}>
+    <article className={`${styles.card} ${status === "mastered" ? styles.masteredCard : status === "review" ? styles.reviewCard : ""}`}>
       <div className={styles.cardHeader}>
         <span>Band {item.band}</span>
         <strong>{item.word}</strong>
@@ -81,6 +102,27 @@ function VocabularyCard({ item }: { item: VocabularyEntry }) {
       </dl>
       <blockquote>{item.examExample}</blockquote>
       <small>{item.usageNote}</small>
+      <div className={styles.vocabActions}>
+        <span>{status === "mastered" ? "已掌握" : status === "review" ? "需要复习" : "未打卡"}</span>
+        <div>
+          <button
+            type="button"
+            disabled={pending}
+            className={status === "review" ? styles.activeReviewAction : ""}
+            onClick={() => onStatusChange(item.id, "review")}
+          >
+            需要复习
+          </button>
+          <button
+            type="button"
+            disabled={pending}
+            className={status === "mastered" ? styles.activeMasteredAction : ""}
+            onClick={() => onStatusChange(item.id, "mastered")}
+          >
+            已掌握
+          </button>
+        </div>
+      </div>
     </article>
   );
 }
@@ -164,13 +206,27 @@ function WritingCard({ item }: { item: WritingPrompt }) {
   );
 }
 
-export function ResourceCenter({ initialTab = "vocabulary" }: { initialTab?: ResourceTab }) {
+export function ResourceCenter({
+  initialTab = "vocabulary",
+  initialVocabularyProgress = {
+    masteredIds: [],
+    reviewIds: [],
+    streakDays: 0,
+    weeklyMinutes: 0,
+  },
+}: {
+  initialTab?: ResourceTab;
+  initialVocabularyProgress?: VocabularyProgressView;
+}) {
   const [activeTab, setActiveTab] = useState<ResourceTab>(initialTab);
   const [query, setQuery] = useState("");
   const [band, setBand] = useState<"all" | VocabularyBand>("all");
   const [practiceSkill, setPracticeSkill] = useState<(typeof practiceSkillOptions)[number]>("all");
   const [speakingCategory, setSpeakingCategory] = useState<(typeof speakingCategories)[number]>("all");
   const [writingTaskType, setWritingTaskType] = useState<(typeof writingTaskTypes)[number]>("all");
+  const [vocabularyProgress, setVocabularyProgress] = useState(initialVocabularyProgress);
+  const [pendingVocabularyId, setPendingVocabularyId] = useState<string | null>(null);
+  const [progressMessage, setProgressMessage] = useState<string | null>(null);
 
   const filteredVocabulary = useMemo(
     () =>
@@ -246,6 +302,51 @@ export function ResourceCenter({ initialTab = "vocabulary" }: { initialTab?: Res
     writing: filteredWriting.length,
   } satisfies Record<ResourceTab, number>;
 
+  const vocabularyStatus = useMemo(() => {
+    const statuses = new Map<string, "mastered" | "review">();
+    for (const id of vocabularyProgress.reviewIds) statuses.set(id, "review");
+    for (const id of vocabularyProgress.masteredIds) statuses.set(id, "mastered");
+    return statuses;
+  }, [vocabularyProgress.masteredIds, vocabularyProgress.reviewIds]);
+
+  async function updateVocabularyStatus(resourceId: string, status: "mastered" | "review") {
+    const previous = vocabularyProgress;
+    const optimistic = {
+      ...previous,
+      masteredIds:
+        status === "mastered"
+          ? [...new Set([...previous.masteredIds, resourceId])]
+          : previous.masteredIds.filter((id) => id !== resourceId),
+      reviewIds:
+        status === "review"
+          ? [...new Set([...previous.reviewIds, resourceId])]
+          : previous.reviewIds.filter((id) => id !== resourceId),
+    };
+    setVocabularyProgress(optimistic);
+    setPendingVocabularyId(resourceId);
+    setProgressMessage(null);
+    try {
+      const response = await fetch("/api/resources/vocabulary/progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resourceId, status }),
+      });
+      const payload = (await response.json()) as ProgressApiResponse;
+      if (!response.ok || !payload.ok) {
+        setVocabularyProgress(previous);
+        setProgressMessage(payload.ok ? "打卡失败，请稍后重试。" : payload.error.message);
+        return;
+      }
+      setVocabularyProgress(payload.data);
+      setProgressMessage(status === "mastered" ? "已记录掌握状态。" : "已加入复习队列。");
+    } catch {
+      setVocabularyProgress(previous);
+      setProgressMessage("打卡失败，请检查网络后重试。");
+    } finally {
+      setPendingVocabularyId(null);
+    }
+  }
+
   return (
     <div className={styles.page}>
       <header className={styles.hero}>
@@ -314,8 +415,37 @@ export function ResourceCenter({ initialTab = "vocabulary" }: { initialTab?: Res
               ))}
             </div>
           </div>
+          <div className={styles.vocabularySummary} aria-label="今日词汇打卡">
+            <div>
+              <span>已掌握</span>
+              <strong>{vocabularyProgress.masteredIds.length}</strong>
+            </div>
+            <div>
+              <span>待复习</span>
+              <strong>{vocabularyProgress.reviewIds.length}</strong>
+            </div>
+            <div>
+              <span>连续学习</span>
+              <strong>{vocabularyProgress.streakDays} 天</strong>
+            </div>
+            <div>
+              <span>本周学习</span>
+              <strong>{vocabularyProgress.weeklyMinutes} 分钟</strong>
+            </div>
+          </div>
+          {progressMessage ? (
+            <p className={styles.progressMessage} role="status">{progressMessage}</p>
+          ) : null}
           <div className={styles.cardGrid}>
-            {filteredVocabulary.map((item) => <VocabularyCard key={item.id} item={item} />)}
+            {filteredVocabulary.map((item) => (
+              <VocabularyCard
+                key={item.id}
+                item={item}
+                status={vocabularyStatus.get(item.id) ?? null}
+                pending={pendingVocabularyId === item.id}
+                onStatusChange={(resourceId, nextStatus) => void updateVocabularyStatus(resourceId, nextStatus)}
+              />
+            ))}
           </div>
         </section>
       ) : null}

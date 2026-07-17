@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 import { AppShell } from "@/components/app-shell";
+import { getVocabularyProgressData } from "@/features/learning-progress/learning-progress-server";
 import { readStudentId } from "@/features/onboarding/api-authorization";
 import { ResourceCenter } from "@/features/resources/resource-center";
 import { isResourceTab, type ResourceTab } from "@/features/resources/resource-catalog";
@@ -17,14 +18,15 @@ export default async function ResourcesPage({
   searchParams: Promise<{ tab?: string }>;
 }) {
   const session = await auth.api.getSession({ headers: await headers() });
-  readStudentId(session);
+  const userId = readStudentId(session);
   const studentName = session?.user.name?.trim() || "同学";
   const params = await searchParams;
   const initialTab: ResourceTab = isResourceTab(params.tab) ? params.tab : "vocabulary";
+  const vocabularyProgress = await getVocabularyProgressData(userId);
 
   return (
     <AppShell studentName={studentName}>
-      <ResourceCenter initialTab={initialTab} />
+      <ResourceCenter initialTab={initialTab} initialVocabularyProgress={vocabularyProgress} />
     </AppShell>
   );
 }

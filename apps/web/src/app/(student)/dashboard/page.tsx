@@ -6,6 +6,7 @@ import { AppShell } from "@/components/app-shell";
 import { StudentDashboard } from "@/features/dashboard/student-dashboard";
 import { demoStudentWorkbench } from "@/features/dashboard/student-workbench-data";
 import { studyPlanToWorkbenchView } from "@/features/dashboard/student-workbench-real-data";
+import { getDashboardLearningStats } from "@/features/learning-progress/learning-progress-server";
 import { membershipRepository } from "@/features/membership/membership-server";
 import { onboardingDb, onboardingService } from "@/features/onboarding/onboarding-server";
 import { getStudyPlanView } from "@/features/study-plan/study-plan-data";
@@ -50,9 +51,16 @@ export default async function DashboardPage() {
           studentName,
         });
         if (planView.state === "ready") {
-          const credits = await membershipRepository.getCreditBalance(userId);
+          const [credits, learningStats] = await Promise.all([
+            membershipRepository.getCreditBalance(userId),
+            getDashboardLearningStats(userId),
+          ]);
           stage = "ready";
-          data = studyPlanToWorkbenchView(planView, { credits });
+          data = studyPlanToWorkbenchView(planView, {
+            credits,
+            streakDays: learningStats.streakDays,
+            completedMinutes: learningStats.completedMinutes,
+          });
         } else {
           stage = "assessment";
         }
