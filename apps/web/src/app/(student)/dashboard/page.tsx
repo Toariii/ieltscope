@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 
 import { AppShell } from "@/components/app-shell";
 import { StudentDashboard } from "@/features/dashboard/student-dashboard";
@@ -18,17 +18,29 @@ export default async function DashboardPage() {
   const studentName = session?.user.name?.trim() || "同学";
   const userId = session?.user.id;
   const data = { ...demoStudentWorkbench, studentName };
-  let stage: "onboarding" | "assessment" | "ready" = "onboarding";
+  let stage: "onboarding" | "assessment" | "assessmentSubmitted" | "ready" = "onboarding";
 
   if (userId) {
     const draft = await onboardingService.getDraft(userId);
     if (draft.completedAt) {
-      const [completedAssessment] = await onboardingDb
-        .select({ id: assessments.id })
+      const [latestAssessment] = await onboardingDb
+        .select({ id: assessments.id, status: assessments.status })
         .from(assessments)
-        .where(and(eq(assessments.userId, userId), eq(assessments.status, "completed")))
+        .where(
+          and(
+            eq(assessments.userId, userId),
+            inArray(assessments.status, ["draft", "in_progress", "submitted", "completed"]),
+          ),
+        )
+        .orderBy(desc(assessments.updatedAt), desc(assessments.createdAt))
         .limit(1);
-      stage = completedAssessment ? "ready" : "assessment";
+      if (latestAssessment?.status === "completed") {
+        stage = "ready";
+      } else if (latestAssessment?.status === "submitted") {
+        stage = "assessmentSubmitted";
+      } else {
+        stage = "assessment";
+      }
     }
   }
 

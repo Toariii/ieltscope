@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, ChevronRight, Loader2 } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { assessmentQuestions, type AssessmentAnswerInput, type Skill } from "@ielts/contracts";
@@ -78,8 +79,14 @@ export function AssessmentRunner({
       <section className={styles.submittedPanel}>
         <p>基础诊断</p>
         <h1>诊断已提交</h1>
-        <span>你的作答已经保存。后续 AI 评分和教师校准模块接入后，会在这里生成四科基础结果与学习计划。</span>
-        <a href="/dashboard">返回工作台</a>
+        <span>你的作答已经保存，并会进入 AI 初评与教师校准预留流程。结果生成前，工作台会保持等待评分状态，不提前展示模拟计划。</span>
+        <div className={styles.submittedSteps} aria-label="评分生成进度">
+          <strong>作答已保存</strong>
+          <strong>AI 初评排队</strong>
+          <strong>教师校准接口预留</strong>
+          <strong>生成四科报告与计划</strong>
+        </div>
+        <Link href="/dashboard">返回工作台</Link>
       </section>
     );
   }

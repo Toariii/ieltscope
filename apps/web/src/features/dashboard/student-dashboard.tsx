@@ -13,6 +13,7 @@ import {
   Play,
   Sparkles,
   Target,
+  WandSparkles,
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -33,7 +34,7 @@ import { StatusPill } from "@/components/status-pill";
 import styles from "./student-dashboard.module.css";
 import type { SkillId, StudentWorkbenchView, WorkbenchTask } from "./student-workbench-data";
 
-export type DashboardStage = "onboarding" | "assessment" | "ready";
+export type DashboardStage = "onboarding" | "assessment" | "assessmentSubmitted" | "ready";
 
 const stageContent = {
   onboarding: {
@@ -52,6 +53,14 @@ const stageContent = {
     href: "/assessment",
     steps: ["听力约 15 分钟", "阅读约 15 分钟", "写作约 20 分钟", "口语约 10 分钟"],
   },
+  assessmentSubmitted: {
+    eyebrow: "已提交",
+    title: "诊断已提交，等待评分生成",
+    description: "你的四科诊断已进入评分流程。系统会先进行 AI 初评，再预留教师校准接口；结果生成前不会展示模拟计划，避免误导后续训练。",
+    action: "查看提交状态",
+    href: "/assessment",
+    steps: ["作答已保存", "AI 初评排队", "教师校准接口预留", "生成四科报告与计划"],
+  },
 } as const;
 
 function SetupStage({ stage, studentName }: { stage: Exclude<DashboardStage, "ready">; studentName: string }) {
@@ -64,7 +73,13 @@ function SetupStage({ stage, studentName }: { stage: Exclude<DashboardStage, "re
       </header>
       <main className={styles.setupMain}>
         <section className={styles.setupIntro} aria-labelledby="setup-title">
-          <div className={styles.setupIcon}><ClipboardList aria-hidden="true" /></div>
+          <div className={styles.setupIcon}>
+            {stage === "assessmentSubmitted" ? (
+              <WandSparkles aria-hidden="true" />
+            ) : (
+              <ClipboardList aria-hidden="true" />
+            )}
+          </div>
           <p>{content.eyebrow}</p>
           <h1 id="setup-title">{content.title}</h1>
           <span>{content.description}</span>

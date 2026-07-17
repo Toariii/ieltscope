@@ -12,6 +12,10 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
 - Students can save each answer independently.
 - The page shows answered progress and enables submission only after all required sections are answered.
 - Submitted assessments use status `submitted`; they are not treated as scored or completed.
+- The dashboard now distinguishes three post-onboarding states:
+  - no diagnostic or draft/in-progress diagnostic: continue ability diagnostic;
+  - submitted diagnostic: show a waiting-for-scoring handoff with saved-answer, AI initial scoring and teacher-calibration steps;
+  - completed diagnostic: unlock the full workbench.
 - The full dashboard remains locked until a future completed assessment exists.
 
 ## Data Flow
@@ -22,6 +26,7 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
 - `/api/assessment` returns the current snapshot.
 - `/api/assessment/answers` saves or replaces one answer by question id.
 - `/api/assessment/submit` submits after all required alpha questions are answered.
+- `/dashboard` reads the latest active assessment status. It never treats `submitted` as a scored result, so simulated plans stay hidden while scoring is pending.
 
 ## Deferred
 
@@ -30,6 +35,7 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
 - Timers, pause/resume rules and anti-refresh edge cases.
 - AI scoring, independent scoring engine, teacher anchors and provider routing.
 - Conversion from submitted diagnostic to completed diagnostic, skill estimates and study plan generation.
+- Actual evaluation job queue, scoring status timestamps and report page details beyond the current waiting shell.
 
 ## Verification
 

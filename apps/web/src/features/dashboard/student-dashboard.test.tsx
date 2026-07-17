@@ -28,6 +28,21 @@ describe("StudentDashboard", () => {
     expect(screen.queryByRole("region", { name: "四科目标" })).not.toBeInTheDocument();
   });
 
+  it("keeps submitted diagnostics in a waiting-for-scoring state", () => {
+    render(<StudentDashboard data={demoStudentWorkbench} stage="assessmentSubmitted" />);
+
+    expect(screen.getByRole("heading", { name: "诊断已提交，等待评分生成" })).toBeVisible();
+    expect(screen.getByText("作答已保存")).toBeVisible();
+    expect(screen.getByText("AI 初评排队")).toBeVisible();
+    expect(screen.getByText("教师校准接口预留")).toBeVisible();
+    expect(screen.getByRole("link", { name: "查看提交状态" })).toHaveAttribute(
+      "href",
+      "/assessment",
+    );
+    expect(screen.queryByRole("region", { name: "今日计划" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "四科目标" })).not.toBeInTheDocument();
+  });
+
   it("shows the student's goal, plan, skills and account resources", () => {
     render(<StudentDashboard data={demoStudentWorkbench} />);
 
