@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  assessmentEvaluationStages,
+  assessmentEvaluationStatuses,
   assessmentQuestionIds,
   assessmentSections,
   validateAssessmentAnswerInput,
@@ -24,6 +26,15 @@ describe("assessment contract", () => {
     ]);
     expect(assessmentSections.reduce((sum, section) => sum + section.estimatedMinutes, 0)).toBe(60);
     expect(assessmentQuestionIds).toContain("speaking-part2-sample");
+  });
+
+  it("defines stable evaluation queue states for submitted diagnostics", () => {
+    expect(assessmentEvaluationStatuses).toEqual(["queued", "processing", "completed", "failed"]);
+    expect(assessmentEvaluationStages).toEqual([
+      "ai_initial_scoring",
+      "teacher_calibration",
+      "report_generation",
+    ]);
   });
 
   it("accepts a valid answer for a known question", () => {

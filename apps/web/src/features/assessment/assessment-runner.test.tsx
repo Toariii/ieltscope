@@ -21,6 +21,7 @@ const baseSnapshot: AssessmentSnapshot = {
   canSubmit: false,
   submittedAt: null,
   completedAt: null,
+  evaluation: null,
 };
 
 function answerSnapshot(answer: AssessmentAnswerInput): AssessmentSnapshot {
@@ -68,6 +69,20 @@ describe("AssessmentRunner", () => {
       status: "submitted",
       canSubmit: false,
       submittedAt: "2026-07-17T01:00:00.000Z",
+      evaluation: {
+        id: "assessment-evaluation-1",
+        status: "queued",
+        stage: "ai_initial_scoring",
+        rubricVersion: "diagnostic-alpha-v1",
+        provider: null,
+        model: null,
+        queuedAt: "2026-07-17T01:00:00.000Z",
+        processingStartedAt: null,
+        teacherCalibrationRequestedAt: null,
+        completedAt: null,
+        failedAt: null,
+        failureCode: null,
+      },
     };
     const api: AssessmentClientApi = {
       saveAnswer: vi.fn(),
@@ -78,6 +93,7 @@ describe("AssessmentRunner", () => {
     fireEvent.click(screen.getByRole("button", { name: "提交诊断" }));
 
     expect(await screen.findByRole("heading", { name: "诊断已提交" })).toBeVisible();
+    expect(await screen.findByText("评分任务已排队")).toBeVisible();
     expect(api.submit).toHaveBeenCalledOnce();
   });
 });

@@ -35,6 +35,12 @@ import styles from "./student-dashboard.module.css";
 import type { SkillId, StudentWorkbenchView, WorkbenchTask } from "./student-workbench-data";
 
 export type DashboardStage = "onboarding" | "assessment" | "assessmentSubmitted" | "ready";
+export type DashboardAssessmentEvaluation = {
+  status: "queued" | "processing" | "completed" | "failed";
+  stage: "ai_initial_scoring" | "teacher_calibration" | "report_generation";
+  rubricVersion: string;
+  queuedAt: string | null;
+};
 
 const stageContent = {
   onboarding: {
@@ -63,8 +69,35 @@ const stageContent = {
   },
 } as const;
 
-function SetupStage({ stage, studentName }: { stage: Exclude<DashboardStage, "ready">; studentName: string }) {
+const dashboardEvaluationStatusCopy = {
+  queued: "评分任务已排队",
+  processing: "AI 初评进行中",
+  completed: "诊断报告已生成",
+  failed: "评分任务需要处理",
+} as const;
+
+const dashboardEvaluationStageCopy = {
+  ai_initial_scoring: "AI 初评",
+  teacher_calibration: "教师校准",
+  report_generation: "报告生成",
+} as const;
+
+function SetupStage({
+  stage,
+  studentName,
+  assessmentEvaluation,
+}: {
+  stage: Exclude<DashboardStage, "ready">;
+  studentName: string;
+  assessmentEvaluation?: DashboardAssessmentEvaluation | null;
+}) {
   const content = stageContent[stage];
+  const evaluationStatus = assessmentEvaluation
+    ? dashboardEvaluationStatusCopy[assessmentEvaluation.status]
+    : "等待创建评分任务";
+  const evaluationStage = assessmentEvaluation
+    ? dashboardEvaluationStageCopy[assessmentEvaluation.stage]
+    : "评分准备";
   return (
     <div className={styles.dashboard}>
       <header className={styles.setupWelcome}>
@@ -83,6 +116,13 @@ function SetupStage({ stage, studentName }: { stage: Exclude<DashboardStage, "re
           <p>{content.eyebrow}</p>
           <h1 id="setup-title">{content.title}</h1>
           <span>{content.description}</span>
+          {stage === "assessmentSubmitted" ? (
+            <div className={styles.setupStatusCard}>
+              <strong>{evaluationStatus}</strong>
+              <small>当前阶段：{evaluationStage}</small>
+              <small>评分规则：{assessmentEvaluation?.rubricVersion ?? "diagnostic-alpha-v1"}</small>
+            </div>
+          ) : null}
           <Link href={content.href}>{content.action}<ArrowRight aria-hidden="true" /></Link>
         </section>
         <ol className={styles.setupSteps} aria-label={stage === "onboarding" ? "建档步骤" : "诊断科目"}>
@@ -134,9 +174,11 @@ function TaskRow({ task }: { task: WorkbenchTask }) {
 export function StudentDashboard({
   data,
   stage = "ready",
+  assessmentEvaluation = null,
 }: {
   data: StudentWorkbenchView;
   stage?: DashboardStage;
+  assessmentEvaluation?: DashboardAssessmentEvaluation | null;
 }) {
   const [activeTrend, setActiveTrend] = useState<SkillId>("overall");
   const activeTrendLabel = trendTabs.find((tab) => tab.id === activeTrend)?.label ?? "总分";
@@ -153,7 +195,15 @@ export function StudentDashboard({
     [activeTrend, data.trend],
   );
 
-  if (stage !== "ready") return <SetupStage stage={stage} studentName={data.studentName} />;
+  if (stage !== "ready") {
+    return (
+      <SetupStage
+        stage={stage}
+        studentName={data.studentName}
+        assessmentEvaluation={assessmentEvaluation}
+      />
+    );
+  }
 
   return (
     <div className={styles.dashboard} id="dashboard-top">

@@ -38,6 +38,14 @@ export type ValidationResult = {
 };
 
 export type AssessmentStatus = "draft" | "in_progress" | "submitted" | "completed";
+export const assessmentEvaluationStatuses = ["queued", "processing", "completed", "failed"] as const;
+export const assessmentEvaluationStages = [
+  "ai_initial_scoring",
+  "teacher_calibration",
+  "report_generation",
+] as const;
+export type AssessmentEvaluationStatus = (typeof assessmentEvaluationStatuses)[number];
+export type AssessmentEvaluationStage = (typeof assessmentEvaluationStages)[number];
 export type AssessmentQuestionKind = "single_choice" | "short_text" | "long_text";
 
 export type AssessmentSection = {

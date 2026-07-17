@@ -7,7 +7,7 @@ import { StudentDashboard } from "@/features/dashboard/student-dashboard";
 import { demoStudentWorkbench } from "@/features/dashboard/student-workbench-data";
 import { onboardingDb, onboardingService } from "@/features/onboarding/onboarding-server";
 import { auth } from "@/lib/auth/server";
-import { assessments } from "@/lib/db/schema";
+import { assessmentEvaluations, assessments } from "@/lib/db/schema";
 
 export const metadata: Metadata = {
   title: "学习工作台 | IELTScope",
@@ -19,6 +19,12 @@ export default async function DashboardPage() {
   const userId = session?.user.id;
   const data = { ...demoStudentWorkbench, studentName };
   let stage: "onboarding" | "assessment" | "assessmentSubmitted" | "ready" = "onboarding";
+  let assessmentEvaluation: {
+    status: "queued" | "processing" | "completed" | "failed";
+    stage: "ai_initial_scoring" | "teacher_calibration" | "report_generation";
+    rubricVersion: string;
+    queuedAt: string | null;
+  } | null = null;
 
   if (userId) {
     const draft = await onboardingService.getDraft(userId);
@@ -38,6 +44,22 @@ export default async function DashboardPage() {
         stage = "ready";
       } else if (latestAssessment?.status === "submitted") {
         stage = "assessmentSubmitted";
+        const [evaluation] = await onboardingDb
+          .select({
+            status: assessmentEvaluations.status,
+            stage: assessmentEvaluations.stage,
+            rubricVersion: assessmentEvaluations.rubricVersion,
+            queuedAt: assessmentEvaluations.queuedAt,
+          })
+          .from(assessmentEvaluations)
+          .where(eq(assessmentEvaluations.assessmentId, latestAssessment.id))
+          .limit(1);
+        assessmentEvaluation = evaluation
+          ? {
+              ...evaluation,
+              queuedAt: evaluation.queuedAt.toISOString(),
+            }
+          : null;
       } else {
         stage = "assessment";
       }
@@ -46,7 +68,7 @@ export default async function DashboardPage() {
 
   return (
     <AppShell studentName={studentName}>
-      <StudentDashboard data={data} stage={stage} />
+      <StudentDashboard data={data} stage={stage} assessmentEvaluation={assessmentEvaluation} />
     </AppShell>
   );
 }

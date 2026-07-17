@@ -7,6 +7,7 @@ import {
   type AssessmentRepository,
   type StoredAssessment,
   type StoredAssessmentAnswer,
+  type StoredAssessmentEvaluation,
 } from "./assessment-service";
 
 const answers: AssessmentAnswerInput[] = [
@@ -29,14 +30,18 @@ const answers: AssessmentAnswerInput[] = [
 function createMemoryRepository() {
   const assessments = new Map<string, StoredAssessment>();
   const answerRows = new Map<string, StoredAssessmentAnswer[]>();
+  const evaluations = new Map<string, StoredAssessmentEvaluation>();
   let counter = 0;
+  let evaluationCounter = 0;
 
   const repository: AssessmentRepository = {
     async findActiveByUser(userId) {
       return [...assessments.values()].find(
         (assessment) =>
           assessment.userId === userId &&
-          (assessment.status === "draft" || assessment.status === "in_progress"),
+          (assessment.status === "draft" ||
+            assessment.status === "in_progress" ||
+            assessment.status === "submitted"),
       ) ?? null;
     },
     async create(userId) {
@@ -57,6 +62,35 @@ function createMemoryRepository() {
     async listAnswers(assessmentId) {
       return answerRows.get(assessmentId) ?? [];
     },
+    async findEvaluationByAssessment(assessmentId) {
+      return [...evaluations.values()].find(
+        (evaluation) => evaluation.assessmentId === assessmentId,
+      ) ?? null;
+    },
+    async enqueueEvaluation(assessment, queuedAt) {
+      const existing = [...evaluations.values()].find(
+        (evaluation) => evaluation.assessmentId === assessment.id,
+      );
+      if (existing) return existing;
+      evaluationCounter += 1;
+      const evaluation: StoredAssessmentEvaluation = {
+        id: `assessment-evaluation-${evaluationCounter}`,
+        assessmentId: assessment.id,
+        status: "queued",
+        stage: "ai_initial_scoring",
+        rubricVersion: "diagnostic-alpha-v1",
+        provider: null,
+        model: null,
+        queuedAt,
+        processingStartedAt: null,
+        teacherCalibrationRequestedAt: null,
+        completedAt: null,
+        failedAt: null,
+        failureCode: null,
+      };
+      evaluations.set(evaluation.id, evaluation);
+      return evaluation;
+    },
     async saveAnswer(assessmentId, input) {
       const rows = answerRows.get(assessmentId) ?? [];
       const current = rows.filter((row) => row.answer.questionId !== input.questionId);
@@ -70,7 +104,7 @@ function createMemoryRepository() {
     },
   };
 
-  return { repository, assessments, answerRows };
+  return { repository, assessments, answerRows, evaluations };
 }
 
 describe("assessment service", () => {
@@ -110,5 +144,27 @@ describe("assessment service", () => {
       currentSection: "speaking",
       submittedAt: new Date("2026-07-17T00:00:00Z"),
     });
+    expect(submitted.evaluation).toMatchObject({
+      status: "queued",
+      stage: "ai_initial_scoring",
+      rubricVersion: "diagnostic-alpha-v1",
+      queuedAt: "2026-07-17T00:00:00.000Z",
+    });
+    expect(memory.evaluations).toHaveLength(1);
+  });
+
+  it("does not enqueue duplicate scoring jobs for an already submitted assessment", async () => {
+    const memory = createMemoryRepository();
+    const service = createAssessmentService(memory.repository, {
+      now: () => new Date("2026-07-17T00:00:00Z"),
+    });
+    for (const answer of answers) {
+      await service.saveAnswer("user-1", answer);
+    }
+
+    await service.submit("user-1");
+    await service.submit("user-1");
+
+    expect(memory.evaluations).toHaveLength(1);
   });
 });

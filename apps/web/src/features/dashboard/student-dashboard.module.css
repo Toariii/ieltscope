@@ -75,6 +75,28 @@
   line-height: 1.8;
 }
 
+.setupStatusCard {
+  display: grid;
+  max-width: 520px;
+  margin-top: 22px;
+  padding: 17px 19px;
+  border: 1px solid #bbd3cd;
+  border-left: 4px solid #0f7066;
+  border-radius: 7px;
+  background: #fff;
+  gap: 6px;
+}
+
+.setupStatusCard strong {
+  color: #133d35;
+  font-size: 15px;
+}
+
+.setupStatusCard small {
+  color: #68756f;
+  font-size: 11px;
+}
+
 .setupIntro > a {
   display: inline-flex;
   min-height: 44px;

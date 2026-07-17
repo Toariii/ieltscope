@@ -12,9 +12,11 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
 - Students can save each answer independently.
 - The page shows answered progress and enables submission only after all required sections are answered.
 - Submitted assessments use status `submitted`; they are not treated as scored or completed.
+- Submitting a diagnostic now enqueues one `assessment_evaluations` record with status `queued`, stage `ai_initial_scoring` and rubric version `diagnostic-alpha-v1`.
+- Submission is idempotent for scoring: repeated visits or duplicate submit actions reuse the existing evaluation record.
 - The dashboard now distinguishes three post-onboarding states:
   - no diagnostic or draft/in-progress diagnostic: continue ability diagnostic;
-  - submitted diagnostic: show a waiting-for-scoring handoff with saved-answer, AI initial scoring and teacher-calibration steps;
+  - submitted diagnostic: show a waiting-for-scoring handoff with the current evaluation status, AI initial scoring and teacher-calibration steps;
   - completed diagnostic: unlock the full workbench.
 - The full dashboard remains locked until a future completed assessment exists.
 
@@ -22,11 +24,11 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
 
 - `@ielts/contracts` owns the diagnostic blueprint and answer validation.
 - `assessment-service` owns progress and submission rules.
-- `assessment-repository` persists to existing `assessments` and `assessment_answers` tables.
+- `assessment-repository` persists to `assessments`, `assessment_answers` and the new `assessment_evaluations` queue table.
 - `/api/assessment` returns the current snapshot.
 - `/api/assessment/answers` saves or replaces one answer by question id.
-- `/api/assessment/submit` submits after all required alpha questions are answered.
-- `/dashboard` reads the latest active assessment status. It never treats `submitted` as a scored result, so simulated plans stay hidden while scoring is pending.
+- `/api/assessment/submit` submits after all required alpha questions are answered and ensures an evaluation task exists.
+- `/dashboard` reads the latest active assessment and its evaluation status. It never treats `submitted` as a scored result, so simulated plans stay hidden while scoring is pending.
 
 ## Deferred
 
@@ -35,7 +37,7 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
 - Timers, pause/resume rules and anti-refresh edge cases.
 - AI scoring, independent scoring engine, teacher anchors and provider routing.
 - Conversion from submitted diagnostic to completed diagnostic, skill estimates and study plan generation.
-- Actual evaluation job queue, scoring status timestamps and report page details beyond the current waiting shell.
+- Actual scoring worker/provider calls, teacher adjudication UI and report page details beyond the current waiting shell.
 
 ## Verification
 

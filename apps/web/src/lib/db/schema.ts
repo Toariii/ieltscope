@@ -25,6 +25,17 @@ export const evaluationStatus = [
   "completed",
   "failed",
 ] as const;
+export const assessmentEvaluationStatuses = [
+  "queued",
+  "processing",
+  "completed",
+  "failed",
+] as const;
+export const assessmentEvaluationStages = [
+  "ai_initial_scoring",
+  "teacher_calibration",
+  "report_generation",
+] as const;
 export const contentKinds = [
   "vocabulary",
   "listening_question",
@@ -53,6 +64,14 @@ export const examDocumentParseStatuses = [
 
 export const assessmentStatusEnum = pgEnum("assessment_status", assessmentStatus);
 export const evaluationStatusEnum = pgEnum("evaluation_status", evaluationStatus);
+export const assessmentEvaluationStatusEnum = pgEnum(
+  "assessment_evaluation_status",
+  assessmentEvaluationStatuses,
+);
+export const assessmentEvaluationStageEnum = pgEnum(
+  "assessment_evaluation_stage",
+  assessmentEvaluationStages,
+);
 export const contentKindEnum = pgEnum("content_kind", contentKinds);
 export const userRoleEnum = pgEnum("user_role", userRoles);
 export const skillEnum = pgEnum("skill", skills);
@@ -296,6 +315,39 @@ export const assessmentAnswers = pgTable(
     ...timestamps,
   },
   (table) => [index("assessment_answers_assessment_idx").on(table.assessmentId)],
+);
+
+export const assessmentEvaluations = pgTable(
+  "assessment_evaluations",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    assessmentId: uuid("assessment_id")
+      .notNull()
+      .references(() => assessments.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    status: assessmentEvaluationStatusEnum("status").default("queued").notNull(),
+    stage: assessmentEvaluationStageEnum("stage").default("ai_initial_scoring").notNull(),
+    rubricVersion: text("rubric_version").default("diagnostic-alpha-v1").notNull(),
+    provider: text("provider"),
+    model: text("model"),
+    queuedAt: timestamp("queued_at", { withTimezone: true }).defaultNow().notNull(),
+    processingStartedAt: timestamp("processing_started_at", { withTimezone: true }),
+    teacherCalibrationRequestedAt: timestamp("teacher_calibration_requested_at", {
+      withTimezone: true,
+    }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    failedAt: timestamp("failed_at", { withTimezone: true }),
+    failureCode: text("failure_code"),
+    reportSummary: jsonb("report_summary").$type<Record<string, unknown>>(),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("assessment_evaluations_assessment_unique").on(table.assessmentId),
+    index("assessment_evaluations_user_status_idx").on(table.userId, table.status),
+    index("assessment_evaluations_stage_idx").on(table.stage, table.status),
+  ],
 );
 
 export const skillEstimates = pgTable(

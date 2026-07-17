@@ -29,9 +29,23 @@ describe("StudentDashboard", () => {
   });
 
   it("keeps submitted diagnostics in a waiting-for-scoring state", () => {
-    render(<StudentDashboard data={demoStudentWorkbench} stage="assessmentSubmitted" />);
+    render(
+      <StudentDashboard
+        data={demoStudentWorkbench}
+        stage="assessmentSubmitted"
+        assessmentEvaluation={{
+          status: "queued",
+          stage: "ai_initial_scoring",
+          rubricVersion: "diagnostic-alpha-v1",
+          queuedAt: "2026-07-17T01:00:00.000Z",
+        }}
+      />,
+    );
 
     expect(screen.getByRole("heading", { name: "诊断已提交，等待评分生成" })).toBeVisible();
+    expect(screen.getByText("评分任务已排队")).toBeVisible();
+    expect(screen.getByText("当前阶段：AI 初评")).toBeVisible();
+    expect(screen.getByText("评分规则：diagnostic-alpha-v1")).toBeVisible();
     expect(screen.getByText("作答已保存")).toBeVisible();
     expect(screen.getByText("AI 初评排队")).toBeVisible();
     expect(screen.getByText("教师校准接口预留")).toBeVisible();

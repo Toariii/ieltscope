@@ -3,12 +3,13 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import type { AssessmentAnswerInput, AssessmentStatus, Skill } from "@ielts/contracts";
 
 import type { createDatabase } from "@/lib/db/client";
-import { assessmentAnswers, assessments } from "@/lib/db/schema";
+import { assessmentAnswers, assessmentEvaluations, assessments } from "@/lib/db/schema";
 
 import type {
   AssessmentRepository,
   StoredAssessment,
   StoredAssessmentAnswer,
+  StoredAssessmentEvaluation,
 } from "./assessment-service";
 
 type Database = ReturnType<typeof createDatabase>["db"];
@@ -47,6 +48,38 @@ function toStoredAnswer(row: typeof assessmentAnswers.$inferSelect): StoredAsses
   };
 }
 
+function readEvaluationStatus(value: string) {
+  return ["queued", "processing", "completed", "failed"].includes(value)
+    ? (value as StoredAssessmentEvaluation["status"])
+    : "queued";
+}
+
+function readEvaluationStage(value: string) {
+  return ["ai_initial_scoring", "teacher_calibration", "report_generation"].includes(value)
+    ? (value as StoredAssessmentEvaluation["stage"])
+    : "ai_initial_scoring";
+}
+
+function toStoredEvaluation(
+  row: typeof assessmentEvaluations.$inferSelect,
+): StoredAssessmentEvaluation {
+  return {
+    id: row.id,
+    assessmentId: row.assessmentId,
+    status: readEvaluationStatus(row.status),
+    stage: readEvaluationStage(row.stage),
+    rubricVersion: row.rubricVersion,
+    provider: row.provider,
+    model: row.model,
+    queuedAt: row.queuedAt,
+    processingStartedAt: row.processingStartedAt,
+    teacherCalibrationRequestedAt: row.teacherCalibrationRequestedAt,
+    completedAt: row.completedAt,
+    failedAt: row.failedAt,
+    failureCode: row.failureCode,
+  };
+}
+
 export function createAssessmentRepository(db: Database): AssessmentRepository {
   return {
     async findActiveByUser(userId) {
@@ -79,6 +112,33 @@ export function createAssessmentRepository(db: Database): AssessmentRepository {
         .where(eq(assessmentAnswers.assessmentId, assessmentId))
         .orderBy(assessmentAnswers.createdAt);
       return rows.map(toStoredAnswer);
+    },
+
+    async findEvaluationByAssessment(assessmentId) {
+      const [evaluation] = await db
+        .select()
+        .from(assessmentEvaluations)
+        .where(eq(assessmentEvaluations.assessmentId, assessmentId))
+        .limit(1);
+      return evaluation ? toStoredEvaluation(evaluation) : null;
+    },
+
+    async enqueueEvaluation(assessment, queuedAt) {
+      const [evaluation] = await db
+        .insert(assessmentEvaluations)
+        .values({
+          assessmentId: assessment.id,
+          userId: assessment.userId,
+          status: "queued",
+          stage: "ai_initial_scoring",
+          queuedAt,
+        })
+        .onConflictDoUpdate({
+          target: assessmentEvaluations.assessmentId,
+          set: { updatedAt: new Date() },
+        })
+        .returning();
+      return toStoredEvaluation(evaluation);
     },
 
     async saveAnswer(assessmentId, input) {

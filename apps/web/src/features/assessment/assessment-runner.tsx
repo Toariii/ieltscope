@@ -23,6 +23,19 @@ const sectionLabels: Record<Skill, string> = {
   speaking: "口语",
 };
 
+const evaluationStatusCopy = {
+  queued: "评分任务已排队",
+  processing: "AI 初评进行中",
+  completed: "诊断报告已生成",
+  failed: "评分任务需要处理",
+} as const;
+
+const evaluationStageCopy = {
+  ai_initial_scoring: "AI 初评",
+  teacher_calibration: "教师校准",
+  report_generation: "报告生成",
+} as const;
+
 export function AssessmentRunner({
   initialSnapshot,
   api = browserAssessmentApi,
@@ -75,11 +88,22 @@ export function AssessmentRunner({
   }
 
   if (snapshot.status === "submitted" || snapshot.status === "completed") {
+    const evaluationStatus = snapshot.evaluation
+      ? evaluationStatusCopy[snapshot.evaluation.status]
+      : "等待创建评分任务";
+    const evaluationStage = snapshot.evaluation
+      ? evaluationStageCopy[snapshot.evaluation.stage]
+      : "评分准备";
     return (
       <section className={styles.submittedPanel}>
         <p>基础诊断</p>
         <h1>诊断已提交</h1>
         <span>你的作答已经保存，并会进入 AI 初评与教师校准预留流程。结果生成前，工作台会保持等待评分状态，不提前展示模拟计划。</span>
+        <div className={styles.evaluationStatusCard}>
+          <strong>{evaluationStatus}</strong>
+          <small>当前阶段：{evaluationStage}</small>
+          <small>评分规则：{snapshot.evaluation?.rubricVersion ?? "diagnostic-alpha-v1"}</small>
+        </div>
         <div className={styles.submittedSteps} aria-label="评分生成进度">
           <strong>作答已保存</strong>
           <strong>AI 初评排队</strong>

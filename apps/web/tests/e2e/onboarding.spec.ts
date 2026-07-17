@@ -87,6 +87,8 @@ test("answers and submits the free diagnostic after onboarding", async ({ page }
     await page.getByRole("link", { name: "返回工作台" }).click();
     await expect(page).toHaveURL("/dashboard");
     await expect(page.getByRole("heading", { name: "诊断已提交，等待评分生成" })).toBeVisible();
+    await expect(page.getByText("评分任务已排队")).toBeVisible();
+    await expect(page.getByText("评分规则：diagnostic-alpha-v1")).toBeVisible();
     await expect(page.getByText("AI 初评排队")).toBeVisible();
     await expect(page.getByRole("region", { name: "今日计划" })).toHaveCount(0);
   } finally {

@@ -7,6 +7,9 @@ import {
   examDocuments,
   examRecords,
   evaluationStatus,
+  assessmentEvaluationStages,
+  assessmentEvaluationStatuses,
+  assessmentEvaluations,
   goals,
   speakingSubmissions,
   studentProfiles,
@@ -27,6 +30,17 @@ describe("domain enums", () => {
       "processing",
       "completed",
       "failed",
+    ]);
+    expect(assessmentEvaluationStatuses).toEqual([
+      "queued",
+      "processing",
+      "completed",
+      "failed",
+    ]);
+    expect(assessmentEvaluationStages).toEqual([
+      "ai_initial_scoring",
+      "teacher_calibration",
+      "report_generation",
     ]);
     expect(contentKinds).toContain("writing_prompt");
   });
@@ -70,6 +84,30 @@ describe("onboarding records", () => {
     );
     expect(getTableConfig(goals).columns.map((column) => column.name)).toContain(
       "minimum_skills",
+    );
+  });
+});
+
+describe("assessment evaluation pipeline", () => {
+  it("tracks one queued scoring job per submitted diagnostic", () => {
+    const table = getTableConfig(assessmentEvaluations);
+    expect(table.columns.map((column) => column.name)).toEqual(
+      expect.arrayContaining([
+        "assessment_id",
+        "user_id",
+        "status",
+        "stage",
+        "rubric_version",
+        "provider",
+        "model",
+        "queued_at",
+        "teacher_calibration_requested_at",
+        "report_summary",
+      ]),
+    );
+    expect(table.foreignKeys).toHaveLength(2);
+    expect(table.indexes.map((index) => index.config.name)).toContain(
+      "assessment_evaluations_assessment_unique",
     );
   });
 });
