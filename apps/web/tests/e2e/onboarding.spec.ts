@@ -91,6 +91,15 @@ test("answers and submits the free diagnostic after onboarding", async ({ page }
     await expect(page.getByText("评分规则：diagnostic-alpha-v1")).toBeVisible();
     await expect(page.getByText("AI 初评排队")).toBeVisible();
     await expect(page.getByRole("region", { name: "今日计划" })).toHaveCount(0);
+
+    const scoringResponse = await page.request.post("/api/internal/assessment-evaluations/run-dev");
+    expect(scoringResponse.ok()).toBe(true);
+
+    await page.goto("/report");
+    await expect(page.getByRole("heading", { name: "四科诊断报告" })).toBeVisible();
+    await expect(page.getByText("开发期评分模拟器已读取写作文本")).toBeVisible();
+    await expect(page.getByText("补 Part 2 叙事结构")).toBeVisible();
+    await expect(page.getByText("当前阶段：报告生成 · 已完成 · diagnostic-alpha-v1")).toBeVisible();
   } finally {
     await sql`delete from "user" where email = ${email}`;
     await sql.end();

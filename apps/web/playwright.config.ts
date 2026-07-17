@@ -23,6 +23,7 @@ export default defineConfig({
       BETTER_AUTH_SECRET: "local-e2e-secret-at-least-32-characters",
       BETTER_AUTH_URL: "http://localhost:3101",
       DATABASE_URL: "postgresql://ielts:ielts@localhost:5432/ielts",
+      ENABLE_DEV_EVALUATION_SIMULATOR: "true",
     },
   },
 });

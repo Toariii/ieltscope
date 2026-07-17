@@ -2,7 +2,7 @@
 
 ## Scope
 
-This alpha turns `/assessment` from a static placeholder into a working free diagnostic flow. It does not implement AI scoring, audio upload, teacher review, plan generation or VIP credit consumption.
+This alpha turns `/assessment` from a static placeholder into a working free diagnostic flow. It includes a development-only scoring simulator so the internal `submitted -> processing -> completed -> skill_estimates -> /report` chain can be tested. It does not implement real AI scoring, audio upload, teacher review, plan generation or VIP credit consumption.
 
 ## Implemented Behavior
 
@@ -14,6 +14,9 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
 - Submitted assessments use status `submitted`; they are not treated as scored or completed.
 - Submitting a diagnostic now enqueues one `assessment_evaluations` record with status `queued`, stage `ai_initial_scoring` and rubric version `diagnostic-alpha-v1`.
 - Submission is idempotent for scoring: repeated visits or duplicate submit actions reuse the existing evaluation record.
+- A guarded internal endpoint, `/api/internal/assessment-evaluations/run-dev`, can complete the latest submitted/completed diagnostic only when `ENABLE_DEV_EVALUATION_SIMULATOR=true`.
+- The development simulator marks the evaluation as processing, writes four replaceable `skill_estimates`, completes the evaluation, and marks the assessment completed.
+- Simulated rationale is explicitly marked as development-only and must be replaced by provider scoring plus teacher-calibrated evidence before production scoring.
 - The dashboard now distinguishes three post-onboarding states:
   - no diagnostic or draft/in-progress diagnostic: continue ability diagnostic;
   - submitted diagnostic: show a waiting-for-scoring handoff with the current evaluation status, AI initial scoring and teacher-calibration steps;
@@ -29,6 +32,7 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
 - `/api/assessment` returns the current snapshot.
 - `/api/assessment/answers` saves or replaces one answer by question id.
 - `/api/assessment/submit` submits after all required alpha questions are answered and ensures an evaluation task exists.
+- `/api/internal/assessment-evaluations/run-dev` is an internal development trigger. It is authenticated, works only on the current student, and stays closed unless `ENABLE_DEV_EVALUATION_SIMULATOR=true`.
 - `/dashboard` reads the latest active assessment and its evaluation status. It never treats `submitted` as a scored result, so simulated plans stay hidden while scoring is pending.
 - `/report` reads the latest assessment, `assessment_evaluations` and `skill_estimates`; `rationale.summary` and `rationale.priorities` provide the first stable slots for AI/teacher-produced feedback.
 
@@ -38,7 +42,7 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
 - Browser microphone capture and private audio storage.
 - Timers, pause/resume rules and anti-refresh edge cases.
 - AI scoring, independent scoring engine, teacher anchors and provider routing.
-- Conversion worker from submitted diagnostic to completed diagnostic and skill estimates.
+- Production worker conversion from submitted diagnostic to completed diagnostic and skill estimates.
 - Actual scoring worker/provider calls, teacher adjudication UI and study plan generation.
 
 ## Verification
