@@ -35,7 +35,7 @@ const navigation = [
   { label: "词汇", href: "/dashboard#skill-goals", icon: BookOpenText },
   { label: "听力", href: "/dashboard#skill-goals", icon: Headphones },
   { label: "阅读", href: "/dashboard#skill-goals", icon: NotebookTabs },
-  { label: "写作精批", href: "/dashboard#recent-review", icon: FilePenLine },
+  { label: "写作精批", href: "/writing", icon: FilePenLine },
   { label: "口语精批", href: "/dashboard#recent-review", icon: Mic2 },
   { label: "学习报告", href: "/report", icon: BarChart3 },
   { label: "会员中心", href: "/dashboard#membership", icon: CreditCard },
