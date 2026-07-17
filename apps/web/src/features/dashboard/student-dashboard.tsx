@@ -316,7 +316,7 @@ export function StudentDashboard({
               <a href="#today-plan"><Headphones aria-hidden="true" /><span><strong>听力精听</strong><small>场景填空 · 20 分钟</small></span><ArrowRight aria-hidden="true" /></a>
               <a href="#today-plan"><NotebookTabs aria-hidden="true" /><span><strong>阅读专项</strong><small>判断题 · 12 题</small></span><ArrowRight aria-hidden="true" /></a>
               <Link href="/writing"><FilePenLine aria-hidden="true" /><span><strong>写作任务</strong><small>Task 2 · 论证展开</small></span><ArrowRight aria-hidden="true" /></Link>
-              <a href="#today-plan"><Mic2 aria-hidden="true" /><span><strong>口语重录</strong><small>Part 2 · Place</small></span><ArrowRight aria-hidden="true" /></a>
+              <Link href="/speaking"><Mic2 aria-hidden="true" /><span><strong>口语重录</strong><small>Part 2 · Place</small></span><ArrowRight aria-hidden="true" /></Link>
             </div>
           </section>
         </div>

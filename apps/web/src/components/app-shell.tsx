@@ -36,7 +36,7 @@ const navigation = [
   { label: "听力", href: "/dashboard#skill-goals", icon: Headphones },
   { label: "阅读", href: "/dashboard#skill-goals", icon: NotebookTabs },
   { label: "写作精批", href: "/writing", icon: FilePenLine },
-  { label: "口语精批", href: "/dashboard#recent-review", icon: Mic2 },
+  { label: "口语精批", href: "/speaking", icon: Mic2 },
   { label: "学习报告", href: "/report", icon: BarChart3 },
   { label: "会员中心", href: "/dashboard#membership", icon: CreditCard },
 ];

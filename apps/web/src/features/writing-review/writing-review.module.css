@@ -78,9 +78,9 @@
   font-weight: 720;
 }
 
-.editorLabel textarea {
+.editorLabel textarea,
+.editorLabel input {
   width: 100%;
-  resize: vertical;
   border: 1px solid #cbd7d3;
   border-radius: 14px;
   padding: 16px;
@@ -90,7 +90,12 @@
   line-height: 1.75;
 }
 
-.editorLabel textarea:focus {
+.editorLabel textarea {
+  resize: vertical;
+}
+
+.editorLabel textarea:focus,
+.editorLabel input:focus {
   border-color: #0f6b62;
   outline: 3px solid rgb(15 107 98 / 14%);
 }
