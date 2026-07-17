@@ -19,6 +19,7 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
   - submitted diagnostic: show a waiting-for-scoring handoff with the current evaluation status, AI initial scoring and teacher-calibration steps;
   - completed diagnostic: unlock the full workbench.
 - The full dashboard remains locked until a future completed assessment exists.
+- `/report` is now the diagnostic report shell. It shows pending states without fake scores, an empty completed-report shell when four skill estimates are missing, and the full four-skill report when `skill_estimates` are present.
 
 ## Data Flow
 
@@ -29,6 +30,7 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
 - `/api/assessment/answers` saves or replaces one answer by question id.
 - `/api/assessment/submit` submits after all required alpha questions are answered and ensures an evaluation task exists.
 - `/dashboard` reads the latest active assessment and its evaluation status. It never treats `submitted` as a scored result, so simulated plans stay hidden while scoring is pending.
+- `/report` reads the latest assessment, `assessment_evaluations` and `skill_estimates`; `rationale.summary` and `rationale.priorities` provide the first stable slots for AI/teacher-produced feedback.
 
 ## Deferred
 
@@ -36,8 +38,8 @@ This alpha turns `/assessment` from a static placeholder into a working free dia
 - Browser microphone capture and private audio storage.
 - Timers, pause/resume rules and anti-refresh edge cases.
 - AI scoring, independent scoring engine, teacher anchors and provider routing.
-- Conversion from submitted diagnostic to completed diagnostic, skill estimates and study plan generation.
-- Actual scoring worker/provider calls, teacher adjudication UI and report page details beyond the current waiting shell.
+- Conversion worker from submitted diagnostic to completed diagnostic and skill estimates.
+- Actual scoring worker/provider calls, teacher adjudication UI and study plan generation.
 
 ## Verification
 

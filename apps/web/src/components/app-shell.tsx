@@ -27,16 +27,16 @@ import { SignOutButton } from "@/features/auth/sign-out-button";
 import styles from "./app-shell.module.css";
 
 const navigation = [
-  { label: "首页", href: "#dashboard-top", icon: House },
-  { label: "今日计划", href: "#today-plan", icon: CalendarDays },
-  { label: "练习题库", href: "#practice", icon: Compass },
-  { label: "词汇", href: "#skill-goals", icon: BookOpenText },
-  { label: "听力", href: "#skill-goals", icon: Headphones },
-  { label: "阅读", href: "#skill-goals", icon: NotebookTabs },
-  { label: "写作精批", href: "#recent-review", icon: FilePenLine },
-  { label: "口语精批", href: "#recent-review", icon: Mic2 },
-  { label: "学习报告", href: "#score-trend", icon: BarChart3 },
-  { label: "会员中心", href: "#membership", icon: CreditCard },
+  { label: "首页", href: "/dashboard#dashboard-top", icon: House },
+  { label: "今日计划", href: "/dashboard#today-plan", icon: CalendarDays },
+  { label: "练习题库", href: "/dashboard#practice", icon: Compass },
+  { label: "词汇", href: "/dashboard#skill-goals", icon: BookOpenText },
+  { label: "听力", href: "/dashboard#skill-goals", icon: Headphones },
+  { label: "阅读", href: "/dashboard#skill-goals", icon: NotebookTabs },
+  { label: "写作精批", href: "/dashboard#recent-review", icon: FilePenLine },
+  { label: "口语精批", href: "/dashboard#recent-review", icon: Mic2 },
+  { label: "学习报告", href: "/report", icon: BarChart3 },
+  { label: "会员中心", href: "/dashboard#membership", icon: CreditCard },
 ];
 
 export function AppShell({
@@ -61,7 +61,7 @@ export function AppShell({
     event.preventDefault();
     const result = searchResults[0];
     if (result) {
-      window.location.hash = result.href;
+      window.location.href = result.href;
       setSearchQuery("");
     }
   }
@@ -79,7 +79,7 @@ export function AppShell({
           {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
         </button>
 
-        <Link className={styles.mobileBrand} href="#dashboard-top" aria-label="IELTScope 工作台首页">
+        <Link className={styles.mobileBrand} href="/dashboard#dashboard-top" aria-label="IELTScope 工作台首页">
           IELTScope
         </Link>
 
@@ -174,7 +174,7 @@ export function AppShell({
       </header>
 
       <aside className={`${styles.sidebar} ${menuOpen ? styles.sidebarOpen : ""}`}>
-        <Link className={styles.brand} href="#dashboard-top" aria-label="IELTScope 工作台首页">
+        <Link className={styles.brand} href="/dashboard#dashboard-top" aria-label="IELTScope 工作台首页">
           <strong>IELT<span>Scope</span></strong>
           <small>AI 雅思提分系统</small>
         </Link>

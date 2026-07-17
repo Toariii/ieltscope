@@ -65,6 +65,7 @@ describe("StudentDashboard", () => {
     expect(screen.getByRole("region", { name: "今日计划" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "四科目标" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "成绩变化" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "查看诊断报告" })).toHaveAttribute("href", "/report");
     expect(screen.getByRole("region", { name: "最近精批" })).toBeInTheDocument();
     expect(screen.getByText("12 次")).toBeInTheDocument();
     expect(screen.getByText("连续 5 天")).toBeInTheDocument();

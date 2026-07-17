@@ -1,0 +1,314 @@
+.report {
+  width: min(1480px, 100%);
+  margin: 0 auto;
+  padding: 38px 36px 64px;
+  color: #17211e;
+}
+
+.hero {
+  display: grid;
+  min-height: 300px;
+  align-content: center;
+  padding: 48px;
+  border: 1px solid #d8e0dd;
+  border-radius: 9px;
+  background:
+    radial-gradient(circle at 82% 18%, rgb(15 112 102 / 12%), transparent 28%),
+    linear-gradient(135deg, #fff 0%, #f5faf8 100%);
+}
+
+.heroIcon {
+  display: grid;
+  width: 50px;
+  height: 50px;
+  margin-bottom: 24px;
+  place-items: center;
+  border: 1px solid #b9cbc5;
+  border-radius: 8px;
+  background: #eef5f2;
+  color: #0f7066;
+}
+
+.heroIcon svg {
+  width: 23px;
+}
+
+.hero > p,
+.sectionHeading p,
+.overview p {
+  margin: 0 0 9px;
+  color: #0f7066;
+  font-size: 11px;
+  font-weight: 760;
+}
+
+.hero h1 {
+  max-width: 780px;
+  margin: 0;
+  font-size: 38px;
+  line-height: 1.22;
+  letter-spacing: 0;
+}
+
+.hero > span {
+  display: block;
+  max-width: 720px;
+  margin-top: 15px;
+  color: #5f6d67;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.heroActions {
+  display: flex;
+  align-items: center;
+  margin-top: 28px;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.heroActions a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0 18px;
+  border-radius: 6px;
+  background: #0f7066;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 740;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.heroActions svg {
+  width: 15px;
+}
+
+.heroActions small {
+  color: #68756f;
+  font-size: 12px;
+}
+
+.reportGrid {
+  display: grid;
+  margin-top: 24px;
+  gap: 24px;
+}
+
+.overview,
+.skillSection,
+.nextStep,
+.pendingPanel {
+  border: 1px solid #d8e0dd;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.overview {
+  display: grid;
+  align-items: end;
+  padding: 26px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 28px;
+}
+
+.overview h2,
+.sectionHeading h2,
+.nextStep h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.overview span,
+.nextStep p {
+  display: block;
+  max-width: 720px;
+  margin-top: 10px;
+  color: #65746e;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.overview > strong {
+  grid-row: 1 / 3;
+  grid-column: 2;
+  color: #102d27;
+  font-size: 48px;
+  line-height: 1;
+}
+
+.overview > small {
+  grid-column: 2;
+  color: #68756f;
+  font-size: 11px;
+  text-align: right;
+}
+
+.skillSection {
+  padding: 26px;
+}
+
+.sectionHeading {
+  margin-bottom: 18px;
+}
+
+.skillGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.skillGrid article {
+  min-height: 260px;
+  padding: 18px;
+  border: 1px solid #dbe3e0;
+  border-radius: 7px;
+  background: #f8faf9;
+}
+
+.skillHeader,
+.rangeLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.skillHeader span {
+  color: #4e5d57;
+  font-size: 13px;
+  font-weight: 720;
+}
+
+.skillHeader strong {
+  color: #0f7066;
+  font-size: 30px;
+}
+
+.rangeLine {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid #dbe3e0;
+  color: #6a7771;
+  font-size: 11px;
+}
+
+.skillGrid p {
+  margin: 15px 0 0;
+  color: #34453e;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.skillGrid ul {
+  display: grid;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  gap: 9px;
+}
+
+.skillGrid li {
+  display: grid;
+  align-items: start;
+  color: #42534d;
+  font-size: 12px;
+  line-height: 1.45;
+  grid-template-columns: 18px 1fr;
+  gap: 7px;
+}
+
+.skillGrid li svg {
+  width: 15px;
+  color: #c56a30;
+}
+
+.nextStep {
+  display: grid;
+  align-items: start;
+  padding: 24px;
+  grid-template-columns: 30px 1fr;
+  gap: 14px;
+}
+
+.nextStep > svg {
+  width: 22px;
+  color: #0f7066;
+}
+
+.pendingPanel {
+  display: grid;
+  margin-top: 24px;
+  grid-template-columns: repeat(3, 1fr);
+  overflow: hidden;
+}
+
+.pendingPanel > div {
+  display: grid;
+  min-height: 118px;
+  align-content: center;
+  padding: 22px;
+}
+
+.pendingPanel > div + div {
+  border-left: 1px solid #d8e0dd;
+}
+
+.pendingPanel strong,
+.pendingPanel span {
+  display: block;
+}
+
+.pendingPanel strong {
+  font-size: 18px;
+}
+
+.pendingPanel span {
+  margin-top: 7px;
+  color: #68756f;
+  font-size: 12px;
+}
+
+@media (max-width: 1180px) {
+  .skillGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .report {
+    padding: 24px 16px 48px;
+  }
+
+  .hero {
+    min-height: 0;
+    padding: 30px 22px;
+  }
+
+  .hero h1 {
+    font-size: 29px;
+  }
+
+  .overview,
+  .pendingPanel {
+    grid-template-columns: 1fr;
+  }
+
+  .overview > strong,
+  .overview > small {
+    grid-row: auto;
+    grid-column: auto;
+    text-align: left;
+  }
+
+  .skillGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .pendingPanel > div + div {
+    border-top: 1px solid #d8e0dd;
+    border-left: 0;
+  }
+}

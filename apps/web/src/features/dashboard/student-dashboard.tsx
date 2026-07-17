@@ -272,6 +272,7 @@ export function StudentDashboard({
                   <p>阶段评估</p>
                   <h2 id="score-trend-title">成绩变化</h2>
                 </div>
+                <Link href="/report">查看诊断报告 <ArrowRight aria-hidden="true" /></Link>
               </div>
               <div className={styles.trendTabs} role="tablist" aria-label="成绩变化科目">
                 {trendTabs.map((tab) => (
