@@ -1,0 +1,31 @@
+.pill {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 720;
+  white-space: nowrap;
+}
+
+.complete {
+  background: #e9f4ef;
+  color: #176247;
+}
+
+.current {
+  background: #dcefeb;
+  color: #075e54;
+}
+
+.upcoming {
+  background: #eef1f0;
+  color: #68746f;
+}
+
+.warning {
+  background: #fff1db;
+  color: #995c0c;
+}

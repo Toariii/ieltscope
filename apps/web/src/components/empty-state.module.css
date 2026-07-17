@@ -1,0 +1,35 @@
+.empty {
+  display: grid;
+  min-height: 180px;
+  place-items: center;
+  align-content: center;
+  padding: 28px;
+  border: 1px dashed #cbd7d3;
+  border-radius: 6px;
+  color: #62716b;
+  text-align: center;
+}
+
+.empty svg {
+  width: 28px;
+  color: #0f7066;
+}
+
+.empty strong {
+  margin-top: 12px;
+  color: #24332e;
+  font-size: 15px;
+}
+
+.empty p {
+  max-width: 360px;
+  margin: 6px 0 16px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.empty a {
+  color: #0b655b;
+  font-size: 13px;
+  font-weight: 720;
+}

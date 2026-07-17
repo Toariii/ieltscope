@@ -1,0 +1,2 @@
+ALTER TABLE "speaking_submissions" ADD CONSTRAINT "speaking_submissions_parent_submission_id_speaking_submissions_id_fk" FOREIGN KEY ("parent_submission_id") REFERENCES "public"."speaking_submissions"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "writing_submissions" ADD CONSTRAINT "writing_submissions_parent_submission_id_writing_submissions_id_fk" FOREIGN KEY ("parent_submission_id") REFERENCES "public"."writing_submissions"("id") ON DELETE set null ON UPDATE no action;
