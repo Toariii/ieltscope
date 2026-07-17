@@ -28,6 +28,11 @@ import styles from "./public-home.module.css";
 
 type DemoMode = "writing" | "speaking";
 type ToolId = "diagnostic" | "writing" | "speaking" | "plan" | "practice";
+type WorkflowStep = {
+  label: string;
+  tool: ToolId;
+  icon: typeof Target;
+};
 
 const waveform = [
   18, 32, 22, 48, 30, 56, 38, 68, 42, 26, 52, 72, 46, 30, 20, 44, 62, 34, 54, 76, 42,
@@ -95,6 +100,13 @@ const tools: Record<
 
 const toolOrder = Object.keys(tools) as ToolId[];
 
+const workflowSteps: WorkflowStep[] = [
+  { label: "诊断", tool: "diagnostic", icon: BrainCircuit },
+  { label: "精批", tool: "writing", icon: Sparkles },
+  { label: "复练", tool: "practice", icon: RefreshCcw },
+  { label: "更新计划", tool: "plan", icon: CalendarRange },
+];
+
 export function PublicHome() {
   const [demoMode, setDemoMode] = useState<DemoMode>("writing");
   const [activeTool, setActiveTool] = useState<ToolId>("writing");
@@ -105,6 +117,17 @@ export function PublicHome() {
   function moveTool(direction: -1 | 1) {
     const nextIndex = (activeToolIndex + direction + toolOrder.length) % toolOrder.length;
     setActiveTool(toolOrder[nextIndex]);
+  }
+
+  function showWorkflowTool(tool: ToolId) {
+    setActiveTool(tool);
+    if (tool === "writing") {
+      setDemoMode("writing");
+    }
+    const toolsSection = document.getElementById("tools");
+    if (typeof toolsSection?.scrollIntoView === "function") {
+      toolsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   return (
@@ -178,17 +201,17 @@ export function PublicHome() {
         </div>
 
         <div className={styles.workflowRibbon} id="path" aria-label="学习闭环">
-          {[
-            ["诊断", BrainCircuit],
-            ["精批", Sparkles],
-            ["复练", RefreshCcw],
-            ["更新计划", CalendarRange],
-          ].map(([label, Icon], index) => (
-            <div className={index === 1 ? styles.workflowCurrent : ""} key={String(label)}>
+          {workflowSteps.map(({ label, tool, icon: Icon }, index) => (
+            <button
+              className={activeTool === tool ? styles.workflowCurrent : ""}
+              key={label}
+              type="button"
+              onClick={() => showWorkflowTool(tool)}
+            >
               <Icon aria-hidden="true" />
-              <span>{String(label)}</span>
+              <span>{label}</span>
               {index < 3 ? <ChevronRight aria-hidden="true" /> : null}
-            </div>
+            </button>
           ))}
         </div>
       </section>

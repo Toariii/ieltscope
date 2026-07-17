@@ -573,20 +573,32 @@
   background: rgb(248 250 249 / 94%);
 }
 
-.workflowRibbon > div {
+.workflowRibbon > button {
   position: relative;
   display: flex;
   min-height: 58px;
   align-items: center;
   justify-content: center;
   gap: 9px;
+  border: 0;
+  background: transparent;
   color: #53635d;
+  cursor: pointer;
+  font: inherit;
   font-size: 13px;
   font-weight: 690;
+  transition: background 180ms ease, color 180ms ease;
 }
 
-.workflowRibbon > div + div {
+.workflowRibbon > button + button {
   border-left: 1px solid var(--line);
+}
+
+.workflowRibbon > button:hover,
+.workflowRibbon > button:focus-visible {
+  background: #e3eeeb;
+  color: var(--teal-dark);
+  outline: none;
 }
 
 .workflowRibbon svg {
@@ -594,7 +606,7 @@
   height: 17px;
 }
 
-.workflowRibbon > div > svg:last-child {
+.workflowRibbon > button > svg:last-child {
   position: absolute;
   right: 12px;
   color: #93a29c;
@@ -1248,11 +1260,11 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .workflowRibbon > div:nth-child(3) {
+  .workflowRibbon > button:nth-child(3) {
     border-left: 0;
   }
 
-  .workflowRibbon > div:nth-child(n+3) {
+  .workflowRibbon > button:nth-child(n+3) {
     border-top: 1px solid var(--line);
   }
 

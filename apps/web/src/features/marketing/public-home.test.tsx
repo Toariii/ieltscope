@@ -47,6 +47,24 @@ describe("PublicHome", () => {
     expect(screen.getByRole("img", { name: "学生在专业学习空间进行英语口语练习" })).toBeInTheDocument();
   });
 
+  it("uses the learning-loop ribbon as real shortcuts into the tool carousel", () => {
+    render(<PublicHome />);
+
+    const workflow = screen.getByLabelText("学习闭环");
+
+    fireEvent.click(within(workflow).getByRole("button", { name: /诊断/ }));
+    expect(screen.getByRole("heading", { name: "先判断真实起点，再拆解目标分数" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "首次诊断" })).toHaveAttribute("aria-selected", "true");
+
+    fireEvent.click(within(workflow).getByRole("button", { name: /复练/ }));
+    expect(screen.getByRole("heading", { name: "把卡分问题转成可以完成的训练" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "专项训练" })).toHaveAttribute("aria-selected", "true");
+
+    fireEvent.click(within(workflow).getByRole("button", { name: /更新计划/ }));
+    expect(screen.getByRole("heading", { name: "每一次练习都会更新下一步安排" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "动态计划" })).toHaveAttribute("aria-selected", "true");
+  });
+
   it("explains scoring criteria, ranges and confidence in student language", () => {
     render(<PublicHome />);
 
