@@ -290,23 +290,39 @@ function WritingDemo() {
   return (
     <div className={styles.writingDemo}>
       <div className={styles.essayPane}>
-        <div className={styles.demoHeader}><span>Task 2 · Opinion Essay</span><strong>412 words</strong></div>
+        <div className={styles.demoHeader}><span>Task 2 · Student draft</span><strong>Band 6 → 6.5</strong></div>
+        <p className={styles.topicLine}>
+          Topic: Can online courses replace traditional classrooms?
+        </p>
         <p>
-          Public transport can reduce congestion, but cities should not treat it as the
-          <mark> only solution</mark>. Investment decisions also need to consider access,
-          reliability and the needs of different communities.
+          Nowadays, many students choose online courses because{" "}
+          <span className={styles.errorPhrase}>they can study more flexible</span>
+          {" "}and save time on travelling. I partly agree that this method is useful,
+          but it{" "}
+          <span className={styles.errorPhrase}>also bring some problems</span>.
         </p>
         <p className={styles.mutedParagraph}>
-          A balanced policy therefore requires clear priorities and evidence from local travel patterns.
+          If students learn at home for a long time, they may lose motivation because
+          there are no teachers or classmates around them.
         </p>
-        <div className={styles.revisionLine}><span>修改前</span><del>focus to build more roads</del></div>
-        <div className={styles.revisionLine}><span>修改后</span><ins>prioritise reliable public transport</ins></div>
+        <div className={styles.annotationList} aria-label="写作句子批改示例">
+          <div className={styles.annotationLine}>
+            <span>语法</span>
+            <del>study more flexible</del>
+            <ins>study more flexibly</ins>
+          </div>
+          <div className={styles.annotationLine}>
+            <span>主谓一致</span>
+            <del>also bring</del>
+            <ins>also brings</ins>
+          </div>
+        </div>
       </div>
       <aside className={styles.feedbackPane}>
-        <p>初步估分 <strong>6.0</strong><small>置信度 82%</small></p>
+        <p>初步估分 <strong>6.0</strong><small>修改后目标 6.5</small></p>
         <h3>写作批改详情</h3>
-        <div className={styles.feedbackItem}><span>优先改进</span><strong>论点需要更充分展开</strong><p>补充因果链并回应反方限制条件。</p></div>
-        <div className={styles.feedbackItem}><span>表达升级</span><strong>避免绝对化结论</strong><p>当前句可保留，调整限定范围。</p></div>
+        <div className={styles.feedbackItem}><span>必须修改</span><strong>副词与主谓一致错误</strong><p>先修正会直接影响语法准确性的基础错误。</p></div>
+        <div className={styles.feedbackItem}><span>建议展开</span><strong>第二句需要解释“问题”</strong><p>补一句原因或例子，把观点从判断推进到论证。</p></div>
         <button type="button">查看批改详情 <ArrowRight aria-hidden="true" /></button>
       </aside>
     </div>

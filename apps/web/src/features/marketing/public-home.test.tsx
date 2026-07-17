@@ -20,6 +20,10 @@ describe("PublicHome", () => {
     render(<PublicHome />);
 
     expect(screen.getByRole("heading", { name: "写作批改详情" })).toBeInTheDocument();
+    expect(screen.getByText("Topic: Can online courses replace traditional classrooms?")).toBeInTheDocument();
+    expect(screen.getByText("they can study more flexible")).toBeInTheDocument();
+    expect(screen.getByText("study more flexibly")).toBeInTheDocument();
+    expect(screen.getByText("副词与主谓一致错误")).toBeInTheDocument();
 
     const demoTabs = screen.getByRole("tablist", { name: "精批类型" });
     fireEvent.click(within(demoTabs).getByRole("tab", { name: "口语精批" }));

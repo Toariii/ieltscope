@@ -310,11 +310,20 @@
 }
 
 .essayPane > p {
-  margin: 26px 0 0;
+  margin: 20px 0 0;
   color: #293833;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 15px;
-  line-height: 1.75;
+  font-size: 14px;
+  line-height: 1.72;
+}
+
+.essayPane .topicLine {
+  margin-top: 22px;
+  color: #60706a;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 720;
+  letter-spacing: 0.01em;
 }
 
 .essayPane mark {
@@ -327,6 +336,46 @@
 .essayPane .mutedParagraph {
   margin-top: 14px;
   color: #66756f;
+}
+
+.errorPhrase {
+  padding: 1px 3px;
+  border-bottom: 2px solid var(--coral);
+  background: #f5d8d3;
+}
+
+.annotationList {
+  display: grid;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.annotationLine {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 10px 11px;
+  border: 1px solid #d8e1de;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 11px;
+}
+
+.annotationLine span {
+  color: var(--coral);
+  font-weight: 760;
+}
+
+.annotationLine del {
+  color: #98574f;
+  text-decoration-thickness: 1px;
+}
+
+.annotationLine ins {
+  color: var(--teal-dark);
+  font-weight: 750;
+  text-decoration: none;
 }
 
 .revisionLine {
@@ -1184,6 +1233,11 @@
   .speakingMain {
     border-right: 0;
     border-bottom: 1px solid var(--line);
+  }
+
+  .annotationLine {
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
 
   .feedbackPane {
